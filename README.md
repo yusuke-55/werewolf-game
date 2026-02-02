@@ -82,6 +82,12 @@ npm run dev
 
 ---
 
+## 公開URL（デプロイ後に追記）
+
+- App: （ここにデプロイ後のURLを貼る）
+
+---
+
 ## 技術スタック
 
 - 言語: TypeScript
@@ -118,6 +124,27 @@ npm start
 
 ```bash
 docker-compose up --build
+
+---
+
+## デプロイ（Render / 無料で公開）
+
+このアプリはNode.js（Express）で動いており、RenderのWeb Serviceとしてそのままデプロイできます。
+
+1. Renderにログインし、New → Web Service
+2. GitHubのリポジトリ `yusuke-55/werewolf-game` を選択
+3. 設定を以下にします
+   - Build Command: `npm ci && npm run build`
+   - Start Command: `npm start`
+   - （PORTはRender側が自動設定するので追加設定不要）
+4. Deployを押す
+
+デプロイが完了すると `https://xxxx.onrender.com` のようなURLが発行されます。
+
+### GitHubリポジトリにURLを貼る
+
+- README: このREADMEの「公開URL」欄の（ここに…）を実URLに置き換えてpush
+- GitHubのリポジトリ画面: 右側の About → Website にURLを貼る（任意）
 ```
 
 ---
