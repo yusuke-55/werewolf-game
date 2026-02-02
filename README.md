@@ -32,17 +32,30 @@ TypeScript + オブジェクト指向による実装
 - ゲーム進行をフェーズ単位の状態遷移として設計し、進行管理を明確化
 - 各役職をクラスとして分離し、役職追加・変更がしやすい構成にした
 - サーバー主導でゲームを進行し、その状態をSSEでクライアントへ配信する設計を採用
+
 ---
 
-## 準備
+## 準備・起動方法
 
-1.インストール(コマンドを打つ)
+### 1. 依存関係のインストール
 
+プロジェクトで使用しているライブラリをインストールします。
+
+```bash
 npm install
+```
 
-2.起動(コマンドを打つ)
+### 2. アプリケーションの起動
 
+開発用サーバーを起動します。
+
+```bash
 npm run dev
+```
+
+起動後、ブラウザで表示されるURL（例: `http://localhost:3000`）にアクセスしてください。
+
+---
 
 ## 遊び方
 
@@ -126,27 +139,6 @@ npm start
 docker-compose up --build
 
 ```
-
----
-
-## デプロイ（Render / 無料で公開）
-
-このアプリはNode.js（Express）で動いており、RenderのWeb Serviceとしてそのままデプロイできます。
-
-1. Renderにログインし、New → Web Service
-2. GitHubのリポジトリ `yusuke-55/werewolf-game` を選択
-3. 設定を以下にします
-   - Build Command: `npm ci && npm run build`
-   - Start Command: `npm start`
-   - （PORTはRender側が自動設定するので追加設定不要）
-4. Deployを押す
-
-デプロイが完了すると `https://xxxx.onrender.com` のようなURLが発行されます。
-
-### GitHubリポジトリにURLを貼る
-
-- README: このREADMEの「公開URL」欄の（ここに…）を実URLに置き換えてpush
-- GitHubのリポジトリ画面: 右側の About → Website にURLを貼る（任意）
 
 ---
 
