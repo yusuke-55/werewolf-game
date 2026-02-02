@@ -216,9 +216,10 @@
 
 @media (max-width: 740px) {
     .start-screen-image-wrap {
-        --title-left: 3%;
-        --title-top: 0.5%;
-        --title-width: 88%;
+        /* width: calc(var(--title-width) * 2) のため、ここは「半分」を入れて実幅を調整する */
+        --title-left: 4%;
+        --title-top: 8px;
+        --title-width: 46%;
         --menu-left: 50%;
         --menu-top: auto;
         --menu-width: min(520px, calc(100% - 28px));
@@ -366,10 +367,18 @@ body {
     min-width: 1200px;
 }
 
+/* レスポンシブ：画面が狭い場合は最小幅固定を解除 */
+@media (max-width: 1200px) {
+    body {
+        min-width: 0;
+    }
+}
+
 /* ゲームコンテナ */
 .game-container {
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     border: none !important;
@@ -591,7 +600,89 @@ body {
     gap: 0;
     /* ヘッダーを消した分を詰める */
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
+}
+
+/* ========== モバイル/タブレット：縦積み（1カラム） ========== */
+@media (max-width: 900px) {
+    .game-main {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 60%) minmax(0, 40%);
+        overflow: hidden;
+    }
+
+    .left-column {
+        border-right: none;
+        border-bottom: 2px solid #16213e;
+    }
+
+    /* タイマー行：狭い幅でも潰れないように折り返し */
+    .timer-section {
+        padding: 10px 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    /* 「タイトル画面に戻る」：右固定だと被りやすいので下に流す */
+    .return-to-title-btn {
+        position: static;
+        transform: none;
+        right: auto;
+        top: auto;
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 10px 12px;
+    }
+
+    .return-to-title-btn:hover {
+        transform: none;
+    }
+
+    /* 右側パネル：上下分割内で収まるよう高さ/スクロールを調整 */
+    .right-column {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .action-section {
+        height: clamp(180px, 36vh, 380px);
+        height: clamp(180px, 36dvh, 380px);
+    }
+
+    .section-header {
+        padding: 12px 14px;
+        font-size: 1.02rem;
+    }
+
+    .player-list {
+        padding: 12px;
+    }
+
+    .chat-log {
+        padding: 14px;
+    }
+}
+
+/* さらに狭いスマホ：タップしやすいサイズ感に寄せる */
+@media (max-width: 480px) {
+    .timer-info {
+        font-size: 1rem;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .user-input {
+        font-size: 16px; /* iOSの自動ズーム抑止 */
+    }
+
+    .vote-btn {
+        padding: 12px 14px;
+        font-size: 1rem;
+    }
 }
 
 /* ========== 左カラム：議論ログエリア（2/3） ========== */
