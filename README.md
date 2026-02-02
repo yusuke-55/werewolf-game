@@ -95,9 +95,9 @@ npm run dev
 
 ---
 
-## 公開URL（デプロイ後に追記）
+## デモ
 
-- App: https://werewolf-game-jup7.onrender.com
+- URL: https://werewolf-game-jup7.onrender.com
 
 ---
 
