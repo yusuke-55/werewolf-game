@@ -216,14 +216,34 @@
 
 @media (max-width: 740px) {
     .start-screen-image-wrap {
-        /* width: calc(var(--title-width) * 2) のため、ここは「半分」を入れて実幅を調整する */
-        --title-left: 4%;
-        --title-top: 8px;
+        /* モバイルではロゴを中央配置にする（.start-screen-title-logo 側で上書き） */
+        --title-left: 50%;
+        --title-top: 10px;
         --title-width: 46%;
         --menu-left: 50%;
         --menu-top: auto;
         --menu-width: min(520px, calc(100% - 28px));
         --menu-btn-width: 100%;
+    }
+
+    /* タイトルロゴ：スマホでは必ず中央に見えるように配置/サイズを固定 */
+    .start-screen-title-logo {
+        left: 50%;
+        top: 10px;
+        width: min(520px, calc(100% - 28px));
+        transform: translate(-50%, 0);
+    }
+
+    /* 中央配置のまま破綻しないよう、モバイルでは演出を軽めに切り替える */
+    .start-screen.active .start-screen-title-logo {
+        animation:
+            startLogoMoveInMobile 520ms cubic-bezier(.12,.9,.16,1) 0.05s forwards,
+            startLogoReveal 900ms ease 0.05s forwards;
+    }
+
+    @keyframes startLogoMoveInMobile {
+        0%   { opacity: 0; transform: translate(-50%, 0) translateY(-10px) scale(0.985); }
+        100% { opacity: 1; transform: translate(-50%, 0) translateY(0) scale(1); }
     }
     .start-screen-menu {
         left: 50%;
