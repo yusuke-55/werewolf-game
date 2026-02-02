@@ -1,0 +1,22 @@
+node_modules/
+dist/
+*.log
+.env
+.DS_Store
+
+# Playwright
+playwright-report/
+test-results/
+
+# Editors
+.vscode/
+.idea/
+
+# OS junk
+Thumbs.db
+
+# Misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吹き出しテスト</title>
+    <style>
+        body {
+            padding: 40px;
+            background: #0f3460;
+            font-family: sans-serif;
+        }
+
+        /* メッセージ基本 */
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        /* AI発言（左寄せ） */
+        .message.ai {
+            justify-content: flex-start;
+            flex-direction: row;
+        }
+
+        /* ユーザー発言（右寄せ） */
+        .message.user {
+            justify-content: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        /* アイコン */
+        .message .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            flex-shrink: 0;
+            font-size: 1.5rem;
+        }
+
+        /* 吹き出し */
+        .message .bubble {
+            background: #fff;
+            color: #333;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* AI発言の吹き出し - 左側に三角 */
+        .message.ai .bubble::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 8px 8px 8px 0;
+            border-color: transparent #fff transparent transparent;
+        }
+
+        /* ユーザー発言の吹き出し - 右側に三角 */
+        .message.user .bubble::before {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 8px 0 8px 8px;
+            border-color: transparent transparent transparent #fff;
+        }
+
+        /* 名前 */
+        .message .bubble .name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        /* テキスト */
+        .message .bubble .text {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 吹き出しテスト</h1>
+
+    <!-- AI発言 -->
+    <div class="message ai">
+        <div class="icon">🐺</div>
+        <div class="bubble">
+            <div class="name">プレイヤー1</div>
+            <div class="text">私は村人です。皆さんを信じてください。</div>
+        </div>
+    </div>
+
+    <!-- ユーザー発言 -->
+    <div class="message user">
+        <div class="bubble">
+            <div class="name">自分</div>
+            <div class="text">了解しました。様子を見ます。</div>
+        </div>
+    </div>
+
+    <!-- AI発言2 -->
+    <div class="message ai">
+        <div class="icon">🦊</div>
+        <div class="bubble">
+            <div class="name">プレイヤー2</div>
+            <div class="text">占い師です。プレイヤー1は人狼でした！</div>
+        </div>
+    </div>
+
+    <!-- ユーザー発言2 -->
+    <div class="message user">
+        <div class="bubble">
+            <div class="name">自分</div>
+            <div class="text">なるほど、それなら投票します</div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScriptで動的追加テスト
+        setTimeout(() => {
+            const container = document.body;
+            
+            // AI発言を追加
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'message ai';
+            aiMsg.innerHTML = `
+                <div class="icon">🐱</div>
+                <div class="bubble">
+                    <div class="name">プレイヤー3</div>
+                    <div class="text">（JavaScript動的追加テスト）騎士です！</div>
+                </div>
+            `;
+            container.appendChild(aiMsg);
+
+            // ユーザー発言を追加
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `
+                <div class="bubble">
+                    <div class="name">自分</div>
+                    <div class="text">（JavaScript動的追加テスト）わかりました</div>
+                </div>
+            `;
+            container.appendChild(userMsg);
+
+            console.log('✅ 動的追加完了');
+            console.log('AI message class:', aiMsg.className);
+            console.log('User message class:', userMsg.className);
+        }, 1000);
+    </script>
+</body>
+</html>

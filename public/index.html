@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI人狼ゲーム</title>
+    <link rel="stylesheet" href="style.css?v=27">
+</head>
+<body>
+    <!-- スタート画面（初回起動時） -->
+    <div id="startScreen" class="start-screen">
+        <div class="start-screen-image-wrap">
+            <img class="start-screen-image" src="/images/start.png" alt="AI人狼ゲーム スタート画面" />
+
+            <!-- タイトルロゴ（赤枠位置で停止する演出） -->
+            <img id="startScreenTitleLogo" class="start-screen-title-logo" src="/images/title.png" alt="AI人狼ゲーム" />
+
+            <!-- ボタン領域（緑枠内で縦並び） -->
+            <div class="start-screen-menu" aria-label="スタートメニュー">
+                <button id="startScreenStartBtn" class="btn btn-blue start-screen-btn">ゲーム開始</button>
+                <button id="startScreenSettingsBtn" class="btn btn-gray start-screen-btn">設定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <!-- ヘッダー -->
+        <div class="game-header">
+            <div class="header-left">
+                <h1>AI人狼ゲーム</h1>
+            </div>
+            <div class="header-center">
+                <div id="userHeaderInfo" class="user-header-info">
+                    <span id="userHeaderIcon" class="user-header-icon"></span>
+                    <span id="userHeaderName" class="user-header-name"></span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="startBtn" class="btn btn-blue">ゲーム開始</button>
+                <button id="stopBtn" class="btn btn-red">ストップ</button>
+                <button id="skipBtn" class="btn btn-gray">スキップ</button>
+                <!-- デバッグ用UIを削除しました -->
+            </div>
+        </div>
+
+        <!-- メインコンテンツ（2カラム） -->
+        <div class="game-main">
+            <!-- 左カラム：議論ログエリア（2/3幅） -->
+            <div class="left-column">
+                <!-- タイマー -->
+                <div class="timer-section">
+                    <div class="timer-info">
+                        <span id="dayInfo" class="day-text">待機中</span>
+                        <span class="separator">|</span>
+                        <span id="phaseInfo" class="phase-text">-</span>
+                    </div>
+                    <div id="timerDisplay" class="timer-value">--</div>
+
+                    <!-- タイトル画面へ戻る（赤枠位置） -->
+                    <button id="returnToTitleBtn" class="btn btn-gray return-to-title-btn" type="button">タイトル画面に戻る</button>
+                </div>
+
+                <!-- チャットログ -->
+                <div id="gameLog" class="chat-log">
+                    <div class="log-placeholder">「ゲーム開始」ボタンを押してゲームを開始してください</div>
+                </div>
+
+                <!-- スクロールインジケータ -->
+                <div id="scrollIndicator" class="scroll-indicator" style="display: none;">
+                    <button id="scrollToBottomBtn" class="scroll-btn">▼</button>
+                </div>
+            </div>
+
+            <!-- 右カラム：プレイヤー情報＋操作エリア（1/3幅） -->
+            <div class="right-column">
+                <!-- 役職中央演出 -->
+                <div id="roleShowcase" class="role-showcase" style="display:none;"></div>
+                <!-- 共通コントロール: プレイヤー情報 / 占い結果 切替ボタン（テキストを削除しボタンを横並び） -->
+                <div class="player-controls">
+                    <div class="view-toggle">
+                        <button id="btnShowPlayers" class="btn btn-gray">プレイヤー情報</button>
+                        <button id="btnShowResults" class="btn btn-blue">占い＆霊能結果</button>
+                    </div>
+                </div>
+                <!-- プレイヤー情報 -->
+                <div class="player-info-section">
+                    <div id="playerList" class="player-list">
+                        <div class="empty-state">ゲーム開始後に表示</div>
+                    </div>
+                </div>
+
+                <!-- 占い＆霊能結果表示（初期非表示） -->
+                <div id="resultsSection" class="results-section" style="display:none;margin-top:12px;overflow:auto;max-height:60vh;">
+                    <div id="resultsContainer" class="player-list results-container">
+                        <!-- 結果テーブルがここに描画されます（プレイヤー情報と同等のレイアウト。表示しきれない場合はスクロールで対応） -->
+                    </div>
+                </div>
+
+                <!-- 操作エリア -->
+                <div class="action-section">
+                    <!-- コマンドパネル：村長の操作ボタン群 -->
+                    <div id="commandPanel" class="command-panel" style="display:none;">
+                        <div class="command-buttons">
+                            <button id="btnForceCO" class="btn btn-blue">COさせる</button>
+                            <button id="btnDesignate" class="btn btn-blue">指定先</button>
+                            <button id="btnAskIndividual" class="btn btn-blue">個別に質問(残り3回)</button>
+                            <button id="btnAskSuspicious" class="btn btn-blue">皆の怪しい人を聞く(残り1回)</button>
+                            <button id="btnProceedVote" class="btn btn-red">投票</button>
+                        </div>
+
+                        <!-- COオプションパネル -->
+                        <div id="coOptions" class="panel" style="display:none;margin-top:8px;">
+                            <div class="panel-title">どの役職をCOさせますか？</div>
+                            <div class="panel-buttons">
+                                <button class="co-role-btn btn">占い師</button>
+                                <button class="co-role-btn btn">霊能者</button>
+                                <button class="co-role-btn btn">狩人</button>
+                            </div>
+                        </div>
+
+                        <!-- 指定先サマリパネル（現在の指定状況） -->
+                        <div id="designateSummaryPanel" class="panel" style="display:none;margin-top:8px;">
+                            <div class="panel-title">現在の指定先</div>
+                            <div class="designate-summary-lines">
+                                <div id="designateSummaryVote">投票先:未指定</div>
+                                <div id="designateSummaryGuard">護衛先:未指定</div>
+                                <div id="designateSummaryDivination">占い先:未指定</div>
+                            </div>
+                            <div class="panel-buttons" style="margin-top:12px;">
+                                <button id="btnDesignateGoOptions" class="btn btn-blue">指定先を決める</button>
+                            </div>
+                        </div>
+
+                        <!-- 指定先パネル -->
+                        <div id="designateOptions" class="panel" style="display:none;margin-top:8px;">
+                            <div class="panel-title">どの指定先を決めますか？</div>
+                            <div class="panel-buttons">
+                                <button data-type="vote" class="designate-type-btn btn">投票先</button>
+                                <button data-type="divination" class="designate-type-btn btn">占い先</button>
+                                <button data-type="guard" class="designate-type-btn btn">護衛先</button>
+                            </div>
+                            <div id="designateTargetList" style="margin-top:8px;display:none;" class="panel-buttons"></div>
+                        </div>
+
+                        <!-- 個別質問パネル -->
+                        <div id="questionPanel" class="panel" style="display:none;margin-top:8px;">
+                            <div class="panel-title">誰を質問しますか？</div>
+                            <div id="questionTargetList" class="panel-buttons" style="margin-top:6px;"> </div>
+                            <div id="questionOptions" style="display:none;margin-top:8px;">
+                                <div class="panel-title">何を質問しますか？</div>
+                                <div class="panel-buttons">
+                                    <button data-q="ask_if_ok_to_be_divined" class="question-btn btn">自分が占われても構わない？</button>
+                                    <button data-q="ask_if_ok_to_be_sacrificed" class="question-btn btn">自分が犠牲でも厭わない？</button>
+                                    <button data-q="ask_if_have_role" class="question-btn btn">何か役職持っている？</button>
+                                    <button data-q="ask_who_will_be_attacked" class="question-btn btn">明日誰が襲われると思う？</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 投票選択欄 -->
+                    <div id="votingArea" class="voting-area" style="display: none;">
+                        <div class="voting-header">投票先を選択</div>
+                        <div id="voteButtonsNew" class="vote-buttons">
+                            <!-- 投票ボタンが動的に追加される -->
+                        </div>
+                    </div>
+
+                    <!-- 占い先選択欄 -->
+                    <div id="nightActionArea" class="voting-area" style="display: none;">
+                        <div class="voting-header">占い先を選択</div>
+                        <div id="nightActionButtons" class="vote-buttons">
+                            <!-- 占い先ボタンが動的に追加される -->
+                        </div>
+                    </div>
+
+                    <!-- 観戦モード表示 -->
+                    <div id="spectatorBanner" class="spectator-banner" style="display: none;">
+                        ⚰️ 観戦モード
+                    </div>
+
+                    <!-- リスタート（ゲーム終了後） -->
+                    <div id="restartPanel" class="restart-panel" style="display:none;">
+                        <button id="playAgainBtn" class="btn btn-blue">もう一度プレイする</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム終了演出（勝利/敗北オーバーレイ） -->
+    <div id="endEffectOverlay" class="end-effect-overlay" aria-hidden="true" style="display:none;">
+        <div class="end-effect-inner">
+            <div id="endEffectTitle" class="end-effect-title">VICTORY</div>
+            <div id="endEffectSub" class="end-effect-sub">村人陣営の勝利</div>
+        </div>
+        <div id="endEffectParticles" class="end-effect-particles"></div>
+    </div>
+
+    <script src="app.js?v=30"></script>
+</body>
+</html>

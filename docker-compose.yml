@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # 現在のNode.jsコンソールアプリケーション
+  app:
+    build: .
+    container_name: werewolf-ai-app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # 将来のMySQL（現在は未使用）
+  # db:
+  #   image: mysql:8.0
+  #   container_name: werewolf-db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root_password
+  #     MYSQL_DATABASE: werewolf
+  #     MYSQL_USER: werewolf_user
+  #     MYSQL_PASSWORD: werewolf_pass
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+
+  # 将来のLaravel APIバックエンド（現在は未実装）
+  # backend:
+  #   build: ./backend
+  #   container_name: werewolf-backend
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_DATABASE=werewolf
+  #     - DB_USERNAME=werewolf_user
+  #     - DB_PASSWORD=werewolf_pass
+
+  # 将来のReactフロントエンド（現在は未実装）
+  # frontend:
+  #   build: ./frontend
+  #   container_name: werewolf-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:8000
+
+# volumes:
+#   mysql_data:

@@ -1,0 +1,9 @@
+# Dockerビルド時に除外するファイル
+node_modules
+dist
+npm-debug.log
+.env
+.git
+.gitignore
+README.md
+docs
