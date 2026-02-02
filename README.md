@@ -95,7 +95,7 @@ npm run dev
 
 ---
 
-## デモ
+## Demo
 
 - URL: https://werewolf-game-jup7.onrender.com
 
