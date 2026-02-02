@@ -84,7 +84,7 @@ npm run dev
 
 ## 公開URL（デプロイ後に追記）
 
-- App: （ここにデプロイ後のURLを貼る）
+- App: https://werewolf-game-jup7.onrender.com
 
 ---
 
@@ -125,6 +125,8 @@ npm start
 ```bash
 docker-compose up --build
 
+```
+
 ---
 
 ## デプロイ（Render / 無料で公開）
@@ -145,7 +147,6 @@ docker-compose up --build
 
 - README: このREADMEの「公開URL」欄の（ここに…）を実URLに置き換えてpush
 - GitHubのリポジトリ画面: 右側の About → Website にURLを貼る（任意）
-```
 
 ---
 
