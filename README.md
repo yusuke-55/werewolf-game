@@ -1,4 +1,5 @@
 # 1人用人狼ゲーム
+Demo:https://werewolf-game-jup7.onrender.com
 
 このゲームは、あなたが村長（進行役）となり、9人の登場人物の中から人狼を見つけ出す
 ブラウザで遊べる 1人用の人狼ゲーム です。
@@ -92,12 +93,6 @@ npm run dev
 
 - 村人陣営、人狼陣営の勝敗が決まると、ゲーム終了です。
 - ゲーム終了後は、右側に「もう一度プレイする」が表示されます。
-
----
-
-## Demo
-
-- URL: https://werewolf-game-jup7.onrender.com
 
 ---
 
