@@ -229,9 +229,12 @@
     /* タイトルロゴ：スマホでは必ず中央に見えるように配置/サイズを固定 */
     .start-screen-title-logo {
         left: 50%;
-        top: 10px;
+        /* 端末によって高さが大きく変わるので clamp で“緑枠の中”に寄せる */
+        top: clamp(96px, 18vh, 170px);
         width: min(520px, calc(100% - 28px));
         transform: translate(-50%, 0);
+        max-height: 22vh;
+        object-fit: contain;
     }
 
     /* 中央配置のまま破綻しないよう、モバイルでは演出を軽めに切り替える */
