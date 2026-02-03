@@ -38,6 +38,7 @@ const userTextInput = document.getElementById('userTextInput');
 const userInputArea = document.getElementById('userInputArea');
 const commandPanel = document.getElementById('commandPanel');
 const playerControls = document.querySelector('.player-controls');
+const leftColumn = document.querySelector('.left-column');
 
 // While conversation/log output is actively updating, keep command panel inactive.
 // We implement this as a debounced lock: each new message extends the lock window.
@@ -315,12 +316,102 @@ const resultsSection = document.getElementById('resultsSection');
 const resultsContainer = document.getElementById('resultsContainer');
 const btnResultsBack = document.getElementById('btnResultsBack');
 
+// Mobile: show side panels (players/results) above the chat log.
+const MOBILE_SIDE_PANEL_BP_PX = 900;
+let mobileSidePanelOpen = false;
+let mobileSidePanelView = null; // 'players' | 'results'
+let playerInfoPlaceholder = null;
+let resultsPlaceholder = null;
+
+function isMobileLayout() {
+    try {
+        return window.matchMedia && window.matchMedia(`(max-width: ${MOBILE_SIDE_PANEL_BP_PX}px)`).matches;
+    } catch (e) {
+        return false;
+    }
+}
+
+function ensureSidePanelPlaceholders() {
+    try {
+        if (!playerInfoPlaceholder && playerInfoSection && playerInfoSection.parentNode) {
+            playerInfoPlaceholder = document.createComment('player-info-section-placeholder');
+            playerInfoSection.parentNode.insertBefore(playerInfoPlaceholder, playerInfoSection);
+        }
+        if (!resultsPlaceholder && resultsSection && resultsSection.parentNode) {
+            resultsPlaceholder = document.createComment('results-section-placeholder');
+            resultsSection.parentNode.insertBefore(resultsPlaceholder, resultsSection);
+        }
+    } catch (e) {}
+}
+
+function restoreSidePanelsToOriginalPlace() {
+    try {
+        if (playerInfoSection) playerInfoSection.classList.remove('mobile-sidepanel-panel');
+        if (resultsSection) resultsSection.classList.remove('mobile-sidepanel-panel');
+    } catch (e) {}
+    try {
+        if (playerInfoSection && playerInfoPlaceholder && playerInfoPlaceholder.parentNode) {
+            playerInfoPlaceholder.parentNode.insertBefore(playerInfoSection, playerInfoPlaceholder.nextSibling);
+        }
+        if (resultsSection && resultsPlaceholder && resultsPlaceholder.parentNode) {
+            resultsPlaceholder.parentNode.insertBefore(resultsSection, resultsPlaceholder.nextSibling);
+        }
+    } catch (e) {}
+}
+
+function moveSidePanelAboveChat(view) {
+    try {
+        if (!leftColumn || !gameLog) return;
+        ensureSidePanelPlaceholders();
+        restoreSidePanelsToOriginalPlace();
+        const target = (view === 'results') ? resultsSection : playerInfoSection;
+        if (!target) return;
+        try { target.classList.add('mobile-sidepanel-panel'); } catch (e) {}
+        leftColumn.insertBefore(target, gameLog);
+    } catch (e) {}
+}
+
+function closeMobileSidePanel() {
+    mobileSidePanelOpen = false;
+    mobileSidePanelView = null;
+    try { restoreSidePanelsToOriginalPlace(); } catch (e) {}
+    applySidePanelView();
+}
+
+function openMobileSidePanel(view) {
+    mobileSidePanelOpen = true;
+    mobileSidePanelView = (view === 'results') ? 'results' : 'players';
+    moveSidePanelAboveChat(mobileSidePanelView);
+    applySidePanelView();
+}
+
 // Side panel view state: keep user's selection across day changes
 let sidePanelView = 'players'; // 'players' | 'results'
 
 function applySidePanelView() {
     try {
         const view = sidePanelView;
+        if (isMobileLayout()) {
+            // On mobile, keep these panels hidden unless explicitly opened.
+            if (!mobileSidePanelOpen) {
+                if (playerInfoSection) playerInfoSection.style.display = 'none';
+                if (resultsSection) resultsSection.style.display = 'none';
+                return;
+            }
+            const openView = mobileSidePanelView || view;
+            if (openView === 'results') {
+                if (playerInfoSection) playerInfoSection.style.display = 'none';
+                if (resultsSection) resultsSection.style.display = '';
+                try { renderResultsTable(); } catch (e) {}
+            } else {
+                if (resultsSection) resultsSection.style.display = 'none';
+                if (playerInfoSection) playerInfoSection.style.display = '';
+            }
+            return;
+        }
+
+        // Desktop/tablet layout: keep showing in the right column.
+        try { if (mobileSidePanelOpen) closeMobileSidePanel(); } catch (e) {}
         if (view === 'results') {
             if (playerInfoSection) playerInfoSection.style.display = 'none';
             if (resultsSection) resultsSection.style.display = '';
@@ -338,8 +429,30 @@ function setSidePanelView(view) {
     } catch (e) {
         sidePanelView = 'players';
     }
+    if (isMobileLayout()) {
+        // Tap again to close on mobile.
+        if (mobileSidePanelOpen && mobileSidePanelView === sidePanelView) {
+            closeMobileSidePanel();
+            return;
+        }
+        openMobileSidePanel(sidePanelView);
+        return;
+    }
     applySidePanelView();
 }
+
+// Keep DOM consistent on resize (e.g. rotate phone)
+try {
+    window.addEventListener('resize', () => {
+        try {
+            if (!isMobileLayout() && mobileSidePanelOpen) {
+                closeMobileSidePanel();
+            } else {
+                applySidePanelView();
+            }
+        } catch (e) {}
+    });
+} catch (e) {}
 
 // 状態管理
 let eventSource = null;

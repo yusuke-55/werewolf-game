@@ -654,9 +654,10 @@ body {
         transform: none;
         right: auto;
         top: auto;
-        width: 100%;
-        max-width: 420px;
-        margin: 0 auto;
+        width: clamp(120px, 33vw, 180px);
+        max-width: none;
+        margin-left: auto;
+        margin-right: 0;
         padding: 10px 12px;
     }
 
@@ -686,6 +687,22 @@ body {
 
     .chat-log {
         padding: 14px;
+    }
+
+    /* スマホ：サイド情報（プレイヤー情報/占い&霊能結果）を会話ログの上に表示 */
+    .mobile-sidepanel-panel {
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 0;
+        max-height: 42vh;
+        max-height: 42dvh;
+        overflow: auto;
+        background: #16213e;
+        border-bottom: 2px solid #0f3460;
+    }
+
+    .mobile-sidepanel-panel .player-list {
+        padding: 12px;
     }
 }
 
