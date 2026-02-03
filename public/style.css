@@ -810,15 +810,17 @@ body {
         min-width: 0;
         padding-left: 10px;
         padding-right: 10px;
+        align-items: center;
     }
 
     .command-panel .command-buttons .btn {
-        width: min(420px, calc(100% - 20px));
-        max-width: none;
-        min-width: 0;
+        width: auto;
+        max-width: min(320px, calc(100% - 40px));
+        min-width: min(260px, calc(100% - 40px));
         margin-left: auto;
         margin-right: auto;
         text-align: center;
+        white-space: normal;
     }
 }
 
@@ -1143,26 +1145,29 @@ body {
         gap: 10px;
         padding-left: 10px;
         padding-right: 10px;
+        align-items: center;
     }
 
     /* 主要ボタン（COさせる〜投票）は横幅を自然にして中央寄せ */
     .command-panel .command-buttons .btn {
-        width: min(420px, calc(100% - 20px));
-        max-width: none;
-        min-width: 0;
+        width: auto;
+        max-width: min(320px, calc(100% - 40px));
+        min-width: min(260px, calc(100% - 40px));
         margin-left: auto;
         margin-right: auto;
         text-align: center;
+        white-space: normal;
     }
 
     /* パネル内の選択ボタンも中央寄せに（左寄せで不自然になるのを防ぐ） */
     .command-panel .panel-buttons .btn {
-        width: min(420px, calc(100% - 20px));
-        max-width: none;
-        min-width: 0;
+        width: auto;
+        max-width: min(320px, calc(100% - 40px));
+        min-width: min(260px, calc(100% - 40px));
         margin-left: auto;
         margin-right: auto;
         text-align: center;
+        white-space: normal;
     }
 
     .player-controls { width: 100%; margin: 0; }
@@ -1872,13 +1877,18 @@ body {
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
-    align-items: stretch !important;
+    align-items: center !important;
     max-height: 220px;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 8px;
 }
 #questionOptions .panel-buttons .btn {
-    width: 100% !important;
+    width: auto !important;
+    max-width: min(320px, calc(100% - 40px)) !important;
+    min-width: min(260px, calc(100% - 40px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     text-align: left !important;
+    white-space: normal !important;
 }
