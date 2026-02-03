@@ -2417,7 +2417,62 @@ function waitForEventSourceOpen(timeoutMs = 1200) {
     }
 }
 
+function fetchWithTimeout(url, options, timeoutMs = 12000) {
+    try {
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const signal = controller ? controller.signal : undefined;
+        const opts = Object.assign({}, options || {}, signal ? { signal } : {});
+        let timeoutId = null;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+                try { if (controller) controller.abort(); } catch (e) {}
+                reject(new Error(`Request timeout: ${url}`));
+            }, timeoutMs);
+        });
+        const fetchPromise = fetch(url, opts);
+        return Promise.race([fetchPromise, timeoutPromise]).finally(() => {
+            try { if (timeoutId) clearTimeout(timeoutId); } catch (e) {}
+        });
+    } catch (e) {
+        // Fallback: no timeout
+        return fetch(url, options || {});
+    }
+}
+
+async function safeReadJsonResponse(response) {
+    // Avoid hangs / opaque failures from response.json() on non-JSON bodies
+    try {
+        const text = await response.text();
+        try {
+            return text ? JSON.parse(text) : {};
+        } catch (e) {
+            return { raw: text };
+        }
+    } catch (e) {
+        return {};
+    }
+}
+
 async function startGameFlow(triggerBtn) {
+    let startedOk = false;
+    const triggerDefaultLabel = (() => {
+        try {
+            if (!triggerBtn) return null;
+            if (triggerBtn === playAgainBtn) return 'もう一度プレイする';
+            return 'ゲーム開始';
+        } catch (e) {
+            return 'ゲーム開始';
+        }
+    })();
+
+    const restoreTriggerBtn = () => {
+        if (!triggerBtn) return;
+        try { triggerBtn.disabled = false; } catch (e) {}
+        try { triggerBtn.textContent = triggerDefaultLabel || 'ゲーム開始'; } catch (e) {}
+        try { triggerBtn.classList.remove('is-loading'); } catch (e) {}
+        try { triggerBtn.removeAttribute('aria-busy'); } catch (e) {}
+    };
+
     try {
         if (triggerBtn) {
             try { triggerBtn.disabled = true; } catch (e) {}
@@ -2433,7 +2488,7 @@ async function startGameFlow(triggerBtn) {
         try { hideEndEffectOverlay(true); } catch (e) {}
 
         // Stop any previous game instance on the server (best-effort) to avoid late events.
-        try { await fetch('/api/reset', { method: 'POST' }); } catch (e) {}
+        try { await fetchWithTimeout('/api/reset', { method: 'POST' }, 8000); } catch (e) {}
 
         // Keep EventSource alive across restarts to avoid missing early init events.
         // Ensure it's connected BEFORE /api/start.
@@ -2447,15 +2502,16 @@ async function startGameFlow(triggerBtn) {
         // ユーザー名・アイコンを送信
         const payload = { userName, userIcon };
         console.log('Fetching /api/start... payload:', payload);
-        const response = await fetch('/api/start', {
+        const response = await fetchWithTimeout('/api/start', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
-        });
-        const data = await response.json();
-        console.log('Start response:', data);
+        }, 20000);
+        const data = await safeReadJsonResponse(response);
+        console.log('Start response:', { ok: response && response.ok, status: response && response.status, data });
 
-        if (response.ok) {
+        if (response && response.ok) {
+            startedOk = true;
             // スタート画面を閉じる
             try { hideStartScreen(); } catch (e) {}
             // UIをリセット
@@ -2479,33 +2535,36 @@ async function startGameFlow(triggerBtn) {
             // コマンドパネルはサーバ通知まで非アクティブ
             try { setCommandPanelActive(false); } catch (e) {}
         } else {
+            const msg = (data && (data.error || data.message)) ? (data.error || data.message) : 'サーバーがゲーム開始に失敗しました';
+            try { console.error('Start failed:', { status: response && response.status, msg, data }); } catch (e) {}
+            try { alert(`ゲームの開始に失敗しました\n${msg}`); } catch (e) {}
             try { if (questionTargetList) questionTargetList.style.display = ''; } catch (e) {}
             try { if (questionOptions) questionOptions.style.display = 'none'; } catch (e) {}
             try { if (questionTargetList) questionTargetList.innerHTML = ''; } catch (e) {}
             startBtn.disabled = false;
             startBtn.textContent = 'ゲーム開始';
-            if (triggerBtn && triggerBtn !== startBtn) {
-                try { triggerBtn.disabled = false; } catch (e) {}
-                try { triggerBtn.textContent = (triggerBtn === playAgainBtn) ? 'もう一度プレイする' : 'ゲーム開始'; } catch (e) {}
-                try { triggerBtn.classList.remove('is-loading'); } catch (e) {}
-                try { triggerBtn.removeAttribute('aria-busy'); } catch (e) {}
-            }
+            restoreTriggerBtn();
             try { showStartScreen(); } catch (e) {}
         }
     } catch (error) {
         console.error('エラー:', error);
-        alert('ゲームの開始に失敗しました');
+        try {
+            const msg = (error && error.message) ? error.message : String(error);
+            alert(`ゲームの開始に失敗しました\n${msg}`);
+        } catch (e) {
+            alert('ゲームの開始に失敗しました');
+        }
         try {
             startBtn.disabled = false;
             startBtn.textContent = 'ゲーム開始';
         } catch (e) {}
-        if (triggerBtn && triggerBtn !== startBtn) {
-            try { triggerBtn.disabled = false; } catch (e) {}
-            try { triggerBtn.textContent = (triggerBtn === playAgainBtn) ? 'もう一度プレイする' : 'ゲーム開始'; } catch (e) {}
-            try { triggerBtn.classList.remove('is-loading'); } catch (e) {}
-            try { triggerBtn.removeAttribute('aria-busy'); } catch (e) {}
-        }
+        restoreTriggerBtn();
         try { showStartScreen(); } catch (e) {}
+    } finally {
+        // If we didn't start successfully, ensure the trigger button isn't left in a loading state.
+        try {
+            if (!startedOk) restoreTriggerBtn();
+        } catch (e) {}
     }
 }
 
