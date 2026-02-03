@@ -592,11 +592,6 @@ body {
     margin-left: 6px;
 }
 
-.btn:hover {
-    opacity: 0.8;
-    transform: translateY(-2px);
-}
-
 .btn:active {
     transform: translateY(0);
 }
@@ -608,6 +603,11 @@ body {
 
 .btn-gray {
     background: #6c757d;
+    color: white;
+}
+
+.btn-red {
+    background: #e74c3c;
     color: white;
 }
 
@@ -1136,9 +1136,35 @@ body {
 }
 
 @media (max-width: 640px) {
-    .command-buttons { width: 100%; min-width: auto; margin: 0; gap: 10px; }
-    .command-panel .panel-buttons .btn { width: 100%; max-width: none; text-align:left; }
-    .command-panel .command-buttons .btn { width: 100%; max-width: none; min-width: 0; margin: 0; text-align: center; }
+    .command-buttons {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        gap: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    /* 主要ボタン（COさせる〜投票）は横幅を自然にして中央寄せ */
+    .command-panel .command-buttons .btn {
+        width: min(420px, calc(100% - 20px));
+        max-width: none;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+
+    /* パネル内の選択ボタンも中央寄せに（左寄せで不自然になるのを防ぐ） */
+    .command-panel .panel-buttons .btn {
+        width: min(420px, calc(100% - 20px));
+        max-width: none;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+
     .player-controls { width: 100%; margin: 0; }
 }
 /* Buttons should only accept pointer events when the command panel is active */
