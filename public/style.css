@@ -640,25 +640,33 @@ body {
         border-bottom: 2px solid #16213e;
     }
 
-    /* タイマー行：狭い幅でも潰れないように折り返し */
+    /* 上部バー：左に日付/フェーズ、右に「タイトル画面に戻る」を配置 */
     .timer-section {
         padding: 10px 12px;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-wrap: nowrap;
+        justify-content: space-between;
         gap: 10px;
     }
 
-    /* 「タイトル画面に戻る」：右固定だと被りやすいので下に流す */
+    .timer-info {
+        flex: 1 1 auto;
+        justify-content: flex-start;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .return-to-title-btn {
         position: static;
         transform: none;
         right: auto;
         top: auto;
-        width: clamp(120px, 33vw, 180px);
-        max-width: none;
-        margin-left: auto;
-        margin-right: 0;
-        padding: 10px 12px;
+        width: auto;
+        max-width: 48vw;
+        margin: 0;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 0.92rem;
     }
 
     .return-to-title-btn:hover {
@@ -689,19 +697,57 @@ body {
         padding: 14px;
     }
 
-    /* スマホ：サイド情報（プレイヤー情報/占い&霊能結果）を会話ログの上に表示 */
-    .mobile-sidepanel-panel {
-        flex: 0 0 auto;
-        width: 100%;
-        min-height: 0;
-        max-height: 42vh;
-        max-height: 42dvh;
-        overflow: auto;
-        background: #16213e;
-        border-bottom: 2px solid #0f3460;
+    /* スマホ：サイド情報（プレイヤー情報/占い&霊能結果）を会話ログに“被せる” */
+    .mobile-sidepanel-overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 80;
+        display: none;
+        background: rgba(0,0,0,0.35);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
 
-    .mobile-sidepanel-panel .player-list {
+    .mobile-sidepanel-overlay.is-open {
+        display: block;
+        animation: mobileOverlayFadeIn 140ms ease-out both;
+    }
+
+    @keyframes mobileOverlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .mobile-sidepanel-overlay-inner {
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        top: 10px;
+        background: #16213e;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+    }
+
+    .mobile-sidepanel-overlay-panel {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobile-sidepanel-overlay-panel .player-list,
+    .mobile-sidepanel-overlay-panel .results-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
         padding: 12px;
     }
 }

@@ -39,6 +39,7 @@ const userInputArea = document.getElementById('userInputArea');
 const commandPanel = document.getElementById('commandPanel');
 const playerControls = document.querySelector('.player-controls');
 const leftColumn = document.querySelector('.left-column');
+const timerSection = document.querySelector('.timer-section');
 
 // While conversation/log output is actively updating, keep command panel inactive.
 // We implement this as a debounced lock: each new message extends the lock window.
@@ -322,6 +323,8 @@ let mobileSidePanelOpen = false;
 let mobileSidePanelView = null; // 'players' | 'results'
 let playerInfoPlaceholder = null;
 let resultsPlaceholder = null;
+let mobileOverlayEl = null;
+let mobileOverlayInnerEl = null;
 
 function isMobileLayout() {
     try {
@@ -344,6 +347,46 @@ function ensureSidePanelPlaceholders() {
     } catch (e) {}
 }
 
+function ensureMobileOverlay() {
+    try {
+        if (mobileOverlayEl && mobileOverlayInnerEl) return;
+        if (!leftColumn) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'mobileSidePanelOverlay';
+        overlay.className = 'mobile-sidepanel-overlay';
+        overlay.setAttribute('aria-hidden', 'true');
+
+        const inner = document.createElement('div');
+        inner.className = 'mobile-sidepanel-overlay-inner';
+        overlay.appendChild(inner);
+
+        // Click outside closes.
+        overlay.addEventListener('click', (ev) => {
+            try {
+                if (ev && ev.target === overlay) closeMobileSidePanel();
+            } catch (e) {}
+        });
+        inner.addEventListener('click', (ev) => {
+            try { ev.stopPropagation(); } catch (e) {}
+        });
+
+        leftColumn.appendChild(overlay);
+        mobileOverlayEl = overlay;
+        mobileOverlayInnerEl = inner;
+        updateMobileOverlayLayout();
+    } catch (e) {}
+}
+
+function updateMobileOverlayLayout() {
+    try {
+        if (!mobileOverlayEl) return;
+        if (!leftColumn || !timerSection) return;
+        const h = timerSection.offsetHeight || 0;
+        mobileOverlayEl.style.top = `${h}px`;
+    } catch (e) {}
+}
+
 function restoreSidePanelsToOriginalPlace() {
     try {
         if (playerInfoSection) playerInfoSection.classList.remove('mobile-sidepanel-panel');
@@ -359,21 +402,30 @@ function restoreSidePanelsToOriginalPlace() {
     } catch (e) {}
 }
 
-function moveSidePanelAboveChat(view) {
+function moveSidePanelIntoOverlay(view) {
     try {
-        if (!leftColumn || !gameLog) return;
+        ensureMobileOverlay();
+        if (!mobileOverlayInnerEl) return;
         ensureSidePanelPlaceholders();
         restoreSidePanelsToOriginalPlace();
+
         const target = (view === 'results') ? resultsSection : playerInfoSection;
         if (!target) return;
-        try { target.classList.add('mobile-sidepanel-panel'); } catch (e) {}
-        leftColumn.insertBefore(target, gameLog);
+        try { target.classList.add('mobile-sidepanel-overlay-panel'); } catch (e) {}
+        mobileOverlayInnerEl.innerHTML = '';
+        mobileOverlayInnerEl.appendChild(target);
     } catch (e) {}
 }
 
 function closeMobileSidePanel() {
     mobileSidePanelOpen = false;
     mobileSidePanelView = null;
+    try {
+        if (mobileOverlayEl) {
+            mobileOverlayEl.classList.remove('is-open');
+            mobileOverlayEl.setAttribute('aria-hidden', 'true');
+        }
+    } catch (e) {}
     try { restoreSidePanelsToOriginalPlace(); } catch (e) {}
     applySidePanelView();
 }
@@ -381,7 +433,14 @@ function closeMobileSidePanel() {
 function openMobileSidePanel(view) {
     mobileSidePanelOpen = true;
     mobileSidePanelView = (view === 'results') ? 'results' : 'players';
-    moveSidePanelAboveChat(mobileSidePanelView);
+    moveSidePanelIntoOverlay(mobileSidePanelView);
+    try {
+        if (mobileOverlayEl) {
+            updateMobileOverlayLayout();
+            mobileOverlayEl.classList.add('is-open');
+            mobileOverlayEl.setAttribute('aria-hidden', 'false');
+        }
+    } catch (e) {}
     applySidePanelView();
 }
 
@@ -396,9 +455,22 @@ function applySidePanelView() {
             if (!mobileSidePanelOpen) {
                 if (playerInfoSection) playerInfoSection.style.display = 'none';
                 if (resultsSection) resultsSection.style.display = 'none';
+                try {
+                    if (mobileOverlayEl) {
+                        mobileOverlayEl.classList.remove('is-open');
+                        mobileOverlayEl.setAttribute('aria-hidden', 'true');
+                    }
+                } catch (e) {}
                 return;
             }
             const openView = mobileSidePanelView || view;
+            try {
+                if (mobileOverlayEl) {
+                    updateMobileOverlayLayout();
+                    mobileOverlayEl.classList.add('is-open');
+                    mobileOverlayEl.setAttribute('aria-hidden', 'false');
+                }
+            } catch (e) {}
             if (openView === 'results') {
                 if (playerInfoSection) playerInfoSection.style.display = 'none';
                 if (resultsSection) resultsSection.style.display = '';
@@ -448,6 +520,7 @@ try {
             if (!isMobileLayout() && mobileSidePanelOpen) {
                 closeMobileSidePanel();
             } else {
+                updateMobileOverlayLayout();
                 applySidePanelView();
             }
         } catch (e) {}
