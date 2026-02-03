@@ -758,7 +758,7 @@ body {
         font-size: 1rem;
         gap: 10px;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .user-input {
