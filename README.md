@@ -29,6 +29,19 @@ TypeScript + オブジェクト指向による実装
 
 ---
 
+## アプリ画面イメージ
+
+### タイトル画面
+![タイトル画面](https://github.com/user-attachments/assets/fe421329-24d2-4224-9f73-6d1f18285c0e)
+
+### インゲーム画面
+![インゲーム画面](https://github.com/user-attachments/assets/8e24972b-1232-416b-ab8a-7791d61e15b5)
+
+### 勝利演出
+![勝利演出](https://github.com/user-attachments/assets/4d04e9a7-bdaa-4630-88f2-97b4408216a7)
+
+---
+
 ## 工夫した点
 - ゲーム進行をフェーズ単位の状態遷移として設計し、進行管理を明確化
 - 各役職をクラスとして分離し、役職追加・変更がしやすい構成にした
