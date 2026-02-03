@@ -325,6 +325,9 @@ let playerInfoPlaceholder = null;
 let resultsPlaceholder = null;
 let mobileOverlayEl = null;
 let mobileOverlayInnerEl = null;
+let mobileOverlayTitleEl = null;
+let mobileOverlayBodyEl = null;
+let mobileOverlayBackBtn = null;
 
 function isMobileLayout() {
     try {
@@ -359,6 +362,31 @@ function ensureMobileOverlay() {
 
         const inner = document.createElement('div');
         inner.className = 'mobile-sidepanel-overlay-inner';
+
+        const header = document.createElement('div');
+        header.className = 'mobile-sidepanel-overlay-header';
+
+        const backBtn = document.createElement('button');
+        backBtn.type = 'button';
+        backBtn.className = 'mobile-sidepanel-back-btn';
+        backBtn.textContent = '戻る';
+        backBtn.addEventListener('click', () => {
+            try { backBtn.blur(); } catch (e) {}
+            closeMobileSidePanel();
+        });
+
+        const title = document.createElement('div');
+        title.className = 'mobile-sidepanel-overlay-title';
+        title.textContent = '';
+
+        header.appendChild(backBtn);
+        header.appendChild(title);
+
+        const body = document.createElement('div');
+        body.className = 'mobile-sidepanel-overlay-body';
+
+        inner.appendChild(header);
+        inner.appendChild(body);
         overlay.appendChild(inner);
 
         // Click outside closes.
@@ -374,7 +402,17 @@ function ensureMobileOverlay() {
         leftColumn.appendChild(overlay);
         mobileOverlayEl = overlay;
         mobileOverlayInnerEl = inner;
+        mobileOverlayTitleEl = title;
+        mobileOverlayBodyEl = body;
+        mobileOverlayBackBtn = backBtn;
         updateMobileOverlayLayout();
+    } catch (e) {}
+}
+
+function setMobileOverlayTitle(view) {
+    try {
+        if (!mobileOverlayTitleEl) return;
+        mobileOverlayTitleEl.textContent = (view === 'results') ? '占い＆霊能結果' : 'プレイヤー情報';
     } catch (e) {}
 }
 
@@ -405,15 +443,16 @@ function restoreSidePanelsToOriginalPlace() {
 function moveSidePanelIntoOverlay(view) {
     try {
         ensureMobileOverlay();
-        if (!mobileOverlayInnerEl) return;
+        if (!mobileOverlayBodyEl) return;
         ensureSidePanelPlaceholders();
         restoreSidePanelsToOriginalPlace();
 
         const target = (view === 'results') ? resultsSection : playerInfoSection;
         if (!target) return;
         try { target.classList.add('mobile-sidepanel-overlay-panel'); } catch (e) {}
-        mobileOverlayInnerEl.innerHTML = '';
-        mobileOverlayInnerEl.appendChild(target);
+        setMobileOverlayTitle(view);
+        mobileOverlayBodyEl.innerHTML = '';
+        mobileOverlayBodyEl.appendChild(target);
     } catch (e) {}
 }
 
@@ -425,6 +464,9 @@ function closeMobileSidePanel() {
             mobileOverlayEl.classList.remove('is-open');
             mobileOverlayEl.setAttribute('aria-hidden', 'true');
         }
+    } catch (e) {}
+    try {
+        if (leftColumn) leftColumn.classList.remove('has-mobile-overlay');
     } catch (e) {}
     try { restoreSidePanelsToOriginalPlace(); } catch (e) {}
     applySidePanelView();
@@ -440,6 +482,9 @@ function openMobileSidePanel(view) {
             mobileOverlayEl.classList.add('is-open');
             mobileOverlayEl.setAttribute('aria-hidden', 'false');
         }
+    } catch (e) {}
+    try {
+        if (leftColumn) leftColumn.classList.add('has-mobile-overlay');
     } catch (e) {}
     applySidePanelView();
 }
