@@ -11,7 +11,7 @@
     "check:unused": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
     "postinstall": "npm run build",
     "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts",
+    "dev": "cross-env AUTO_OPEN_BROWSER=1 ts-node src/server.ts",
     "dev:console": "ts-node src/index.ts",
     "autoplay": "node tools/autoplay.js",
     "check:prune": "ts-prune",
@@ -27,6 +27,7 @@
     "@types/express": "^4.17.21",
     "@types/cors": "^2.8.17",
     "@playwright/test": "^1.50.0",
+    "cross-env": "^7.0.3",
     "ts-prune": "^0.10.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.0"
